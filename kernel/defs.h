@@ -103,6 +103,11 @@ int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 
+//For message passing assignment
+void msgenroll(void);
+void msgsend(void* data, int size, int offset, int recipient);
+void msgread(void* data_out, int size, int offset);
+
 // swtch.S
 void            swtch(struct context*, struct context*);
 

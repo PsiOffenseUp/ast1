@@ -690,3 +690,88 @@ procdump(void)
     printf("\n");
   }
 }
+
+//---------------------- Helper function to print  page tables ------------------------
+
+//Implementation to print a page table.
+//Original code from: https://stackoverflow.com/questions/78211340/is-it-possible-to-manually-change-page-tables-pte-value-xv6-risc-v-c
+//Modified to work with the current version of xv6
+
+static int level = 0;
+static int print_end = 0;
+static uint64 vadd_lv0 = 0;
+static uint64 vadd_lv1 = 0;
+static uint64 vadd_lv2 = 0;
+static pte_t pte = 0;
+
+void printpgtable(pagetable_t pagetable) {
+  if (level == 0){
+    printf("page table %p\n", (void*)&pagetable);
+    print_end = 0;
+    pte = *pagetable;
+  }
+  // iterate 512 PTEs
+  for (uint64 i = 0; i < 512; i++) {    
+    uint64 va = 0;
+    switch(level){
+      case 0:
+        vadd_lv0 = i<<30;
+        va = vadd_lv0;
+        break;
+      case 1:
+        vadd_lv1 = i<<21;
+        va = vadd_lv0+vadd_lv1;
+        break;
+      case 2:
+        vadd_lv2 = i<<12;
+        va = vadd_lv0+vadd_lv1+vadd_lv2;
+        break;
+    }
+    pte_t t = pagetable[i];
+    if (t & PTE_V) {
+      uint64 pa = PTE2PA(t);
+      if (level==0 && i==255)
+        print_end = 1;
+      if (level != 0 && !print_end){     
+        printf("|");
+      }else if (level!=0){
+        printf(" ");
+      }
+      for (int j = 0; j < (level-1)*4+3; j++) printf(" ");
+
+      printf("+-- %p: pte=%p va=%p pa=%p", (void*)i, (void*)t, (void*)va, (void*)pa);
+      printf((t&PTE_V)?" V":"");
+      printf((t&PTE_R)?" R":"");
+      printf((t&PTE_W)?" W":"");
+      printf((t&PTE_X)?" X":"");
+      printf((t&PTE_U)?" U":"");
+
+      printf("\n");
+
+      // PTE without any WRX bit set points to low-level page table
+      if ((t & (PTE_W|PTE_R|PTE_X)) == 0){
+
+        level++;
+        printpgtable((pagetable_t)pa);
+        level--;
+      }
+    }
+  }
+}
+
+//---------------------- Implementations for ast 3 ------------------------
+
+void msgenroll(void)
+{
+  //TODO: Please implement here
+}
+
+void msgsend(void* data, int size, int offset, int recipient)
+{
+  //TODO: Please implement here
+}
+
+void msgread(void* data_out, int size, int offset)
+{
+  //TODO: Please implement here
+}

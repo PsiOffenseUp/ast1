@@ -24,6 +24,9 @@ int getpid(void);
 char *sys_sbrk(int, int);
 int pause(int);
 int uptime(void);
+void msgenroll(void);
+void msgsend(void* data, int size, int offset, int recipient);
+void msgread(void* data_out, int size, int offset);
 
 // ulib.c
 int stat(const char *, struct stat *);

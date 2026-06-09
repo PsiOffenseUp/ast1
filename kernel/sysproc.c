@@ -107,3 +107,41 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_msgenroll(void)
+{
+  msgenroll();
+  return 0;
+}
+
+uint64
+sys_msgsend(void)
+{
+  int d, s, o, r;
+
+  //Retrieve args
+  argint(0, &d);
+  argint(1, &s);
+  argint(2, &o);
+  argint(3, &r);
+
+  //Call the actual function
+  msgsend((void*)(uint64)d, s, o, r);
+  return 0;
+}
+
+uint64
+sys_msgread(void)
+{
+  int d, s, o;
+
+  //Retrieve args
+  argint(0, &d);
+  argint(1, &s);
+  argint(2, &o);
+
+  //Call the actual function
+  msgread((void*)(uint64)d, s, o);
+  return 0;
+}
